@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>0xGery ETHStorage Submission</title>
+    <style>
+        body {
+            background-color: #1e1e1e;
+            color: #FFD700;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+            flex-direction: column;
+        }
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #FFD700;
+            color: #1e1e1e;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #e5c100;
+        }
+        img {
+            width: 100px;
+            height: auto;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Roll the Dice</h1>
+    <p>Choose Low (1-3) or High (4-6)</p>
+    <button onclick="rollDice(false)">Low</button>
+    <button onclick="rollDice(true)">High</button>
+    <p id="result"></p>
+    <div id="content">Loading greeting...</div>
+    <img src="./profile.jpeg" alt="Degen Image" id="degenImage">
+    <script src="https://cdn.ethers.io/lib/ethers-5.0.umd.min.js"></script>
+    <script>
+        const provider = new ethers.providers.JsonRpcProvider('https://sepolia.infura.io/v3/4e99ed50a23a41b69d9d748f26980de4');
+        const contractAddress = '0xde42bc4f14a51a68b15ea5b8946ddf0a6edde580';
+        const abi = [
+            {
+                "inputs": [],
+                "name": "greeting",
+                "outputs": [
+                    {
+                        "internalType": "string",
+                        "name": "",
+                        "type": "string"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "bool",
+                        "name": "guessHigh",
+                        "type": "bool"
+                    }
+                ],
+                "name": "rollDice",
+                "outputs": [
+                    {
+                        "internalType": "string",
+                        "name": "",
+                        "type": "string"
+                    }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            }
+        ];
+        const contract = new ethers.Contract(contractAddress, abi, provider);
+
+        async function fetchData() {
+            try {
+                const greeting = await contract.greeting();
+                document.getElementById('content').textContent = greeting;
+            } catch (error) {
+                console.error('Error fetching greeting:', error);
+            }
+        }
+        window.onload = fetchData;
+
+        async function rollDice(guessHigh) {
+        try {
+            const provider = ethers.getDefaultProvider('https://sepolia.infura.io/v3/4e99ed50a23a41b69d9d748f26980de4');
+            const contractAddress = '0xde42bc4f14a51a68b15ea5b8946ddf0a6edde580';
+            const contract = new ethers.Contract(contractAddress, abi, provider);
+
+            const result = await contract.callStatic.rollDice(guessHigh);
+            const resultElement = document.getElementById('result');
+            
+            if (result.includes("win")) {
+                resultElement.style.backgroundColor = "green";
+            } else if (result.includes("lose")) {
+                resultElement.style.backgroundColor = "red";
+            }
+
+            resultElement.style.color = "#1e1e1e";
+            resultElement.textContent = result;
+        } catch (error) {
+            console.error('Error calling rollDice:', error);
+        }
+        }
+    </script>
+</body>
+</html>
